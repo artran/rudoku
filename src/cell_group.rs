@@ -1,58 +1,66 @@
 use std::collections::HashSet;
 
 pub struct CellGroup {
-    content: HashSet<i8>
+    cells: HashSet<i8>,
 }
 
 impl CellGroup {
     pub fn new() -> CellGroup {
         CellGroup {
-            content: HashSet::with_capacity(9)
+            cells: HashSet::with_capacity(9)
         }
+    }
+
+    pub fn insert(&self, digit: i8) {
+        if digit < 0 || digit > 9 {
+            panic!("Value must be 0 to 9 inclusive");
+        }
+    }
+
+    pub fn remove(&mut self, digit: i8) {
+        // self.cells.remove(&digit);
     }
 }
 
-//     def test_rejects_non_integer(self):
-//         cell_group = CellGroup()
-//         assert_that(cell_group.insert).raises(ValueError).when_called_with('x')
-//
-//     def test_cell_rejects_values_less_than_one(self):
-//         cell_group = CellGroup()
-//
-//         for i in range(-5, 1):
-//             with self.subTest('Candidate values must be greater than zero', candidate=i):
-//                 try:
-//                     cell_group.insert(i)
-//                     fail(f'{i} is not acceptable')
-//                 except ValueError:
-//                     pass
-//
-//     def test_cell_rejects_values_more_than_nine(self):
-//         cell_group = CellGroup()
-//
-//         for i in range(10, 15):
-//             with self.subTest('Candidate values must be less than ten', candidate=i):
-//                 try:
-//                     cell_group.insert(i)
-//                     fail(f'{i} is not acceptable')
-//                 except ValueError:
-//                     pass
-//
-//     def test_cell_accepts_integer_between_1_and_9(self):
-//         cell_group = CellGroup()
-//
-//         for i in range(1, 10):
-//             with self.subTest('Candidate values must be between 1 and 9 inclusive', candidate=i):
-//                 cell_group.insert(i)
-//
-//     def test_insert_returns_true_if_number_is_possible(self):
-//         cell_group = CellGroup()
-//         for i in range(1, 9):
-//             cell_group.insert(i)  # only 9 is missing
-//
-//         for i in range(1, 10):
-//             with self.subTest('Only 9 should be possible', i=i):
-//                 if i != 9:
-//                     assert_that(cell_group.insert(i)).is_false()
-//                 else:
-//                     assert_that(cell_group.insert(i)).is_true()
+#[test]
+#[should_panic(expected="Value must be 0 to 9 inclusive")]
+fn test_insert_rejects_values_less_than_zero() {
+    let cg = CellGroup::new();
+
+    cg.insert(-1);
+}
+
+#[test]
+fn test_insert_accepts_0_to_9() {
+    let cg = CellGroup::new();
+
+    for i in 0..10 {
+        cg.insert(i);
+    }
+}
+
+#[test]
+#[should_panic(expected="Value must be 0 to 9 inclusive")]
+fn test_insert_rejects_values_more_than_nine() {
+    let cg = CellGroup::new();
+
+    cg.insert(10);
+}
+
+#[test]
+fn test_insert_stores_digit() {
+    let cg = CellGroup::new();
+
+}
+
+#[test]
+fn test_contains_returns_true_if_number_is_stored() {
+    let cg = CellGroup::new();
+
+}
+
+#[test]
+fn test_contains_returns_false_if_number_is_not_stored() {
+    let cg = CellGroup::new();
+
+}
