@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 pub struct CellGroup {
-    cells: HashSet<i8>,
+    cells: HashSet<u8>,
 }
 
 impl CellGroup {
@@ -11,28 +11,30 @@ impl CellGroup {
         }
     }
 
-    pub fn insert(&self, digit: i8) {
-        if digit < 0 || digit > 9 {
+    pub fn insert(&mut self, digit: u8) {
+        if digit > 9 {
             panic!("Value must be 0 to 9 inclusive");
         }
+
+        self.cells.insert(digit);
     }
 
-    pub fn remove(&mut self, digit: i8) {
+    pub fn contains(&self, digit: u8) -> bool {
+        self.cells.contains(&digit)
+    }
+
+    pub fn remove(&mut self, digit: u8) {
         // self.cells.remove(&digit);
     }
 }
 
-#[test]
-#[should_panic(expected="Value must be 0 to 9 inclusive")]
-fn test_insert_rejects_values_less_than_zero() {
-    let cg = CellGroup::new();
-
-    cg.insert(-1);
-}
+/* -------------------------------------------------------------------------------------------------
+Tests
+------------------------------------------------------------------------------------------------- */
 
 #[test]
 fn test_insert_accepts_0_to_9() {
-    let cg = CellGroup::new();
+    let mut cg = CellGroup::new();
 
     for i in 0..10 {
         cg.insert(i);
@@ -42,25 +44,33 @@ fn test_insert_accepts_0_to_9() {
 #[test]
 #[should_panic(expected="Value must be 0 to 9 inclusive")]
 fn test_insert_rejects_values_more_than_nine() {
-    let cg = CellGroup::new();
+    let mut cg = CellGroup::new();
 
     cg.insert(10);
 }
 
 #[test]
 fn test_insert_stores_digit() {
-    let cg = CellGroup::new();
+    let mut cg = CellGroup::new();
+    let test_val: u8 = 5;
+    assert_eq!(cg.cells.contains(&test_val), false);
 
+    cg.insert(test_val);
+
+    assert_eq!(cg.cells.contains(&test_val), true);
 }
 
 #[test]
 fn test_contains_returns_true_if_number_is_stored() {
-    let cg = CellGroup::new();
+    let mut cg = CellGroup::new();
+    cg.insert(5);
 
+    assert_eq!(cg.contains(5), true);
 }
 
 #[test]
 fn test_contains_returns_false_if_number_is_not_stored() {
     let cg = CellGroup::new();
 
+    assert_eq!(cg.contains(5), false);
 }
