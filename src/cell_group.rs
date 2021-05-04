@@ -1,5 +1,8 @@
 use std::collections::HashSet;
 
+#[cfg(test)]
+use pretty_assertions::{assert_eq, assert_ne};
+
 pub struct CellGroup {
     cells: HashSet<u8>,
 }
