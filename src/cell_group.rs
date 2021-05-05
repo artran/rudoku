@@ -27,7 +27,7 @@ impl CellGroup {
     }
 
     pub fn remove(&mut self, digit: u8) {
-        // self.cells.remove(&digit);
+        self.cells.remove(&digit);
     }
 }
 
@@ -74,6 +74,17 @@ fn test_contains_returns_true_if_number_is_stored() {
 #[test]
 fn test_contains_returns_false_if_number_is_not_stored() {
     let cg = CellGroup::new();
+
+    assert_eq!(cg.contains(5), false);
+}
+
+#[test]
+fn test_remove_takes_digit_out_of_cell_group() {
+    let mut cg = CellGroup::new();
+    cg.insert(5);
+    assert_eq!(cg.contains(5), true);
+
+    cg.remove(5);
 
     assert_eq!(cg.contains(5), false);
 }
