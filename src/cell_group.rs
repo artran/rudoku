@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+
 pub struct CellGroup {
     cells: HashSet<u8>,
 }
@@ -35,7 +36,8 @@ Tests
 #[cfg(test)]
 mod test {
     use crate::cell_group::CellGroup;
-    use pretty_assertions::assert_eq;
+    use spectral::prelude::*;
+
 
     #[test]
     fn test_insert_accepts_0_to_9() {
@@ -58,11 +60,11 @@ mod test {
     fn test_insert_stores_digit() {
         let mut cg = CellGroup::new();
         let test_val: u8 = 5;
-        assert_eq!(cg.cells.contains(&test_val), false);
+        assert_that!(cg.cells).does_not_contain(&test_val);
 
         cg.insert(test_val);
 
-        assert_eq!(cg.cells.contains(&test_val), true);
+        assert_that!(cg.cells).contains(&test_val);
     }
 
     #[test]
@@ -70,24 +72,24 @@ mod test {
         let mut cg = CellGroup::new();
         cg.insert(5);
 
-        assert_eq!(cg.contains(5), true);
+        assert_that!(cg.cells).contains(5);
     }
 
     #[test]
     fn test_contains_returns_false_if_number_is_not_stored() {
         let cg = CellGroup::new();
 
-        assert_eq!(cg.contains(5), false);
+        assert_that!(cg.cells).does_not_contain(5);
     }
 
     #[test]
     fn test_remove_takes_digit_out_of_cell_group() {
         let mut cg = CellGroup::new();
         cg.insert(5);
-        assert_eq!(cg.contains(5), true);
+        assert_that!(cg.contains(5)).is_true();
 
         cg.remove(5);
 
-        assert_eq!(cg.contains(5), false);
+        assert_that!(cg.contains(5)).is_false();
     }
 }

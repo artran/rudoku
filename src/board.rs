@@ -1,5 +1,6 @@
 use crate::cell_group::CellGroup;
 
+
 pub struct Board {
     cols: Vec<CellGroup>,
     rows: Vec<CellGroup>,
@@ -39,28 +40,28 @@ Tests
 
 mod tests {
     use crate::board::Board;
-    use pretty_assertions::assert_eq;
+    use spectral::prelude::*;
 
 
     #[test]
     fn test_new_board_has_nine_cols() {
         let board = Board::from_string("");
 
-        assert_eq!(board.cols.len(), 9)
+        assert_that!(board.cols).has_length(9);
     }
 
     #[test]
     fn test_new_board_has_nine_rows() {
         let board = Board::from_string("");
 
-        assert_eq!(board.rows.len(), 9)
+        assert_that!(board.rows).has_length(9);
     }
 
     #[test]
     fn test_new_board_has_nine_boxes() {
         let board = Board::from_string("");
 
-        assert_eq!(board.boxes.len(), 9)
+        assert_that!(board.boxes).has_length(9);
     }
 }
 // def test_setting_value_puts_value_in_correct_groups(self):
