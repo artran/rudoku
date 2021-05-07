@@ -9,15 +9,15 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn from_string(board_csv: &str) -> Board {
+    pub fn from_string() -> Self {
         let mut cols = Vec::new();
-        Board::populate_cell_group(&mut cols);
+        Self::populate_cell_group(&mut cols);
         let mut rows = Vec::new();
-        Board::populate_cell_group(&mut rows);
+        Self::populate_cell_group(&mut rows);
         let mut boxes = Vec::new();
-        Board::populate_cell_group(&mut boxes);
+        Self::populate_cell_group(&mut boxes);
 
-        Board {
+        Self {
             cols,
             rows,
             boxes,
@@ -45,21 +45,21 @@ mod tests {
 
     #[test]
     fn test_new_board_has_nine_cols() {
-        let board = Board::from_string("");
+        let board = Board::from_string();
 
         assert_that!(board.cols).has_length(9);
     }
 
     #[test]
     fn test_new_board_has_nine_rows() {
-        let board = Board::from_string("");
+        let board = Board::from_string();
 
         assert_that!(board.rows).has_length(9);
     }
 
     #[test]
     fn test_new_board_has_nine_boxes() {
-        let board = Board::from_string("");
+        let board = Board::from_string();
 
         assert_that!(board.boxes).has_length(9);
     }

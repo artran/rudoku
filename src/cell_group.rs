@@ -6,8 +6,8 @@ pub struct CellGroup {
 }
 
 impl CellGroup {
-    pub fn new() -> CellGroup {
-        CellGroup {
+    pub fn new() -> Self {
+        Self {
             cells: HashSet::with_capacity(9)
         }
     }
