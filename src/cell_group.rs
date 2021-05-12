@@ -20,12 +20,12 @@ impl CellGroup {
         self.cells.insert(digit);
     }
 
-    pub fn contains(&self, digit: u8) -> bool {
-        self.cells.contains(&digit)
+    pub fn contains(&self, digit: &u8) -> bool {
+        self.cells.contains(digit)
     }
 
-    pub fn remove(&mut self, digit: u8) {
-        self.cells.remove(&digit);
+    pub fn remove(&mut self, digit: &u8) {
+        self.cells.remove(digit);
     }
 }
 
@@ -86,10 +86,10 @@ mod test {
     fn test_remove_takes_digit_out_of_cell_group() {
         let mut cg = CellGroup::new();
         cg.insert(5);
-        assert_that!(cg.contains(5)).is_true();
+        assert_that!(cg.contains(&5)).is_true();
 
-        cg.remove(5);
+        cg.remove(&5);
 
-        assert_that!(cg.contains(5)).is_false();
+        assert_that!(cg.contains(&5)).is_false();
     }
 }
