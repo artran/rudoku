@@ -1,3 +1,5 @@
+use csv;
+
 use crate::cell_group::CellGroup;
 
 
@@ -9,26 +11,38 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn from_string() -> Self {
-        let mut cols = Vec::new();
-        Self::populate_cell_group(&mut cols);
-        let mut rows = Vec::new();
-        Self::populate_cell_group(&mut rows);
-        let mut boxes = Vec::new();
-        Self::populate_cell_group(&mut boxes);
-
-        Self {
-            cols,
-            rows,
-            boxes,
+    pub fn from_string(csv_str: &str) -> Self {
+        let board = Self {
+            cols: Self::initialise_empty_cell_groups(),
+            rows: Self::initialise_empty_cell_groups(),
+            boxes: Self::initialise_empty_cell_groups(),
             board: vec![vec![0; 9]; 9],
-        }
+        };
+
+        board.fill_from_csv(csv_str);
+
+        board
     }
 
-    fn populate_cell_group(cell_group: &mut Vec<CellGroup>) {
+    fn initialise_empty_cell_groups() -> Vec<CellGroup> {
+        let mut groups = Vec::new();
+
         for _ in 0..9 {
-            cell_group.push(CellGroup::new());
-        }
+            groups.push(CellGroup::new());
+        };
+
+        groups
+    }
+
+    fn fill_from_csv(&self, csv_str: &str) {
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(csv_str.as_bytes());
+
+        for result in rdr.records() {
+            let record = result.unwrap();
+            println!("{:?}", record);
+        };
     }
 
     pub fn solve(&self) {}
@@ -39,27 +53,27 @@ Tests
 ------------------------------------------------------------------------------------------------- */
 
 mod tests {
-    use crate::board::Board;
     use spectral::prelude::*;
 
+    use crate::board::Board;
 
     #[test]
     fn test_new_board_has_nine_cols() {
-        let board = Board::from_string();
+        let board = Board::from_string("");
 
         assert_that!(board.cols).has_length(9);
     }
 
     #[test]
     fn test_new_board_has_nine_rows() {
-        let board = Board::from_string();
+        let board = Board::from_string("");
 
         assert_that!(board.rows).has_length(9);
     }
 
     #[test]
     fn test_new_board_has_nine_boxes() {
-        let board = Board::from_string();
+        let board = Board::from_string("");
 
         assert_that!(board.boxes).has_length(9);
     }

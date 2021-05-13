@@ -7,7 +7,7 @@ use crate::board::Board;
 
 
 fn main() {
-    let brd = Board::from_string();
+    let brd = Board::from_string("");
 
     brd.solve();
 }
