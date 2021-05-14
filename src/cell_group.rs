@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 
+#[derive(Debug)]
 pub struct CellGroup {
     cells: HashSet<u8>,
 }
