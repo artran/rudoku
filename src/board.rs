@@ -1,8 +1,6 @@
-use csv;
 use itertools::join;
 
 use crate::cell_group::CellGroup;
-
 
 pub struct Board {
     cols: Vec<CellGroup>,
@@ -23,10 +21,15 @@ impl Board {
         }
     }
 
-    pub fn from_string(csv_str: &str) -> Self {
-        let board = Self::new();
+    pub fn from_string(board_str: &str) -> Self {
+        let mut board = Self::new();
 
-        board.fill_from_csv(csv_str);
+        board.board = board_str.chars()
+            .map(|character| character.to_digit(10).unwrap() as u8)
+            .collect::<Vec<u8>>()
+            .chunks(9)
+            .map(|chunk| chunk.to_vec())
+            .collect();
 
         board
     }
@@ -39,17 +42,6 @@ impl Board {
         };
 
         groups
-    }
-
-    fn fill_from_csv(&self, csv_str: &str) {
-        let mut rdr = csv::ReaderBuilder::new()
-            .has_headers(false)
-            .from_reader(csv_str.as_bytes());
-
-        for result in rdr.records() {
-            let record = result.unwrap();
-            println!("{:?}", record);
-        };
     }
 
     fn set_value_at(&mut self, col_idx: &usize, row_idx: &usize, value: u8) -> bool {
@@ -85,7 +77,7 @@ impl Board {
     fn print(&self) -> String {
         let mut result = String::new();
 
-        for row in self.solved_board.iter(){
+        for row in self.solved_board.iter() {
             result.push('[');
             result.push_str(&join(row, ", "));
             result.push_str("],\n");
@@ -277,15 +269,15 @@ mod tests {
 
     #[test]
     fn test_the_board_can_print_itself() {
-        let expected_output = "[1, 2, 3, 0, 0, 0, 0, 0, 0],\n".to_owned()
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
-            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n";
+        let expected_output = String::from("[1, 2, 3, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n\
+            [0, 0, 0, 0, 0, 0, 0, 0, 0],\n");
         let mut board = Board::new();
         board.set_value_at(&1, &1, 1);
         board.set_value_at(&2, &1, 2);
@@ -299,35 +291,36 @@ mod tests {
 
         assert_that!(printed).is_equal_to(expected_output);
     }
+
+    #[test]
+    fn test_the_board_can_be_initialised_from_a_string() {
+        let board_file = String::from("600003000\
+            090867300\
+            037250600\
+            004130200\
+            309000105\
+            008029400\
+            005041720\
+            003796080\
+            000500001");
+
+        let expected_board = vec![
+            vec![6, 0, 0, 0, 0, 3, 0, 0, 0],
+            vec![0, 9, 0, 8, 6, 7, 3, 0, 0],
+            vec![0, 3, 7, 2, 5, 0, 6, 0, 0],
+            vec![0, 0, 4, 1, 3, 0, 2, 0, 0],
+            vec![3, 0, 9, 0, 0, 0, 1, 0, 5],
+            vec![0, 0, 8, 0, 2, 9, 4, 0, 0],
+            vec![0, 0, 5, 0, 4, 1, 7, 2, 0],
+            vec![0, 0, 3, 7, 9, 6, 0, 8, 0],
+            vec![0, 0, 0, 5, 0, 0, 0, 0, 1],
+        ];
+        let board = Board::from_string(&board_file);
+
+        assert_that!(board.board).is_equal_to(expected_board);
+    }
 }
 
-// def test_the_board_can_be_initialised_from_csv_file(self):
-//     board_file = StringIO('6,,,,,3,,,\n'
-//                           ',9,,8,6,7,3,,\n'
-//                           ',3,7,2,5,,6,,\n'
-//                           ',,4,1,3,,2,,\n'
-//                           '3,,9,,,,1,,5\n'
-//                           ',,8,,2,9,4,,\n'
-//                           ',,5,,4,1,7,2,\n'
-//                           ',,3,7,9,6,,8,\n'
-//                           ',,,5,,,,,1\n')
-//     expected_board = [
-//         [6, 0, 0, 0, 0, 3, 0, 0, 0],
-//         [0, 9, 0, 8, 6, 7, 3, 0, 0],
-//         [0, 3, 7, 2, 5, 0, 6, 0, 0],
-//         [0, 0, 4, 1, 3, 0, 2, 0, 0],
-//         [3, 0, 9, 0, 0, 0, 1, 0, 5],
-//         [0, 0, 8, 0, 2, 9, 4, 0, 0],
-//         [0, 0, 5, 0, 4, 1, 7, 2, 0],
-//         [0, 0, 3, 7, 9, 6, 0, 8, 0],
-//         [0, 0, 0, 5, 0, 0, 0, 0, 1]
-//     ]
-//
-//     board = Board()
-//     board.load_file(board_file)
-//
-//     assert_that(board.full_board).is_equal_to(expected_board)
-//
 // @unittest.expectedFailure
 // def test_that_the_board_solves_sudoku(self):
 //     board_file = StringIO('6,,,,,3,,,\n'
