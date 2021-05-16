@@ -22,6 +22,7 @@ impl Board {
     }
 
     pub fn from_string(board_str: &str) -> Self {
+        // Fixme: This is incorrect as it doesn't initialise the CellGroups
         let mut board = Self::new();
 
         board.board = board_str.chars()
@@ -74,7 +75,7 @@ impl Board {
         self.board[row_idx - 1][col_idx - 1] == 0
     }
 
-    fn print(&self) -> String {
+    pub fn print(&self) -> String {
         let mut result = String::new();
 
         for row in self.solved_board.iter() {
@@ -86,13 +87,33 @@ impl Board {
         result
     }
 
-    pub fn solve(&self) {}
+    pub fn solve(&mut self) {
+        for row_idx in 1..10 {
+            for col_idx in 1..10 {
+                println!("{}, {}", row_idx, col_idx);
+                if !self.is_empty_at(&col_idx, &row_idx) {
+                    continue;
+                }
+
+                for value in 1..10 {
+                    if self.set_value_at(&col_idx, &row_idx, value) {
+                        self.solve();
+                        self.clear_value_at(&col_idx, &row_idx);
+                    }
+                }
+                return;
+            }
+        }
+        // Save the state before the recursion unwinds and resets the `full_board`
+        self.solved_board = self.board.clone();
+    }
 }
 
 /* -------------------------------------------------------------------------------------------------
 Tests
 ------------------------------------------------------------------------------------------------- */
 
+#[cfg(test)]
 mod tests {
     use spectral::prelude::*;
 
@@ -319,33 +340,47 @@ mod tests {
 
         assert_that!(board.board).is_equal_to(expected_board);
     }
+
+    #[test]
+    fn test_that_the_board_solves_sudoku() {
+        let board_file = String::from("600003000\
+            090867300\
+            037250600\
+            004130200\
+            309000105\
+            008029400\
+            005041720\
+            003796080\
+            000500001");
+        let expected_solution = vec![
+            vec![6, 4, 2, 9, 1, 3, 8, 5, 7],
+            vec![5, 9, 1, 8, 6, 7, 3, 4, 2],
+            vec![8, 3, 7, 2, 5, 4, 6, 1, 9],
+            vec![7, 6, 4, 1, 3, 5, 2, 9, 8],
+            vec![3, 2, 9, 4, 7, 8, 1, 6, 5],
+            vec![1, 5, 8, 6, 2, 9, 4, 7, 3],
+            vec![9, 8, 5, 3, 4, 1, 7, 2, 6],
+            vec![2, 1, 3, 7, 9, 6, 5, 8, 4],
+            vec![4, 7, 6, 5, 8, 2, 9, 3, 1]
+        ];
+        let mut board = Board::from_string(&board_file);
+
+        board.solve();
+
+        assert_that!(board.solved_board).is_equal_to(expected_solution);
+    }
 }
 
-// @unittest.expectedFailure
-// def test_that_the_board_solves_sudoku(self):
-//     board_file = StringIO('6,,,,,3,,,\n'
-//                           ',9,,8,6,7,3,,\n'
-//                           ',3,7,2,5,,6,,\n'
-//                           ',,4,1,3,,2,,\n'
-//                           '3,,9,,,,1,,5\n'
-//                           ',,8,,2,9,4,,\n'
-//                           ',,5,,4,1,7,2,\n'
-//                           ',,3,7,9,6,,8,\n'
-//                           ',,,5,,,,,1\n')
-//     expected_board = [
-//         [6, 4, 2, 9, 1, 3, 8, 5, 7],
-//         [5, 9, 1, 8, 6, 7, 3, 4, 2],
-//         [8, 3, 7, 2, 5, 4, 6, 1, 9],
-//         [7, 6, 4, 1, 3, 5, 2, 9, 8],
-//         [3, 2, 9, 4, 7, 8, 1, 6, 5],
-//         [1, 5, 8, 6, 2, 9, 4, 7, 3],
-//         [9, 8, 5, 3, 4, 1, 7, 2, 6],
-//         [2, 1, 3, 7, 9, 6, 5, 8, 4],
-//         [4, 7, 6, 5, 8, 2, 9, 3, 1]
-//     ]
+//     def solve(self) -> None:
+//         for row_idx in range(1, 10):
+//             for col_idx in range(1, 10):
+//                 if not self.is_empty_at(col_idx, row_idx):
+//                     continue
 //
-//     board = Board()
-//     board.load_file(board_file)
-//     board.solve()
-//
-//     assert_that(board.full_board).is_equal_to(expected_board)
+//                 for value in range(1, 10):
+//                     if self.set_value_at(col_idx, row_idx, value):
+//                         self.solve()
+//                         self.clear_value_at(col_idx, row_idx)
+//                 return
+//         # Save the state before the recursion unwinds and resets the `full_board`
+//         self.solved_board = deepcopy(self.full_board)
