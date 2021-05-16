@@ -50,8 +50,8 @@ impl Board {
     }
 
     fn set_value_at(&mut self, col_idx: &usize, row_idx: &usize, value: u8) -> bool {
-        let col= &mut self.cols[col_idx - 1];
-        let row= &mut self.rows[row_idx - 1];
+        let col = &mut self.cols[col_idx - 1];
+        let row = &mut self.rows[row_idx - 1];
         let square = &mut self.squares[(col_idx - 1) / 3 + 3 * ((row_idx - 1) / 3)];
 
         if col.contains(&value) || row.contains(&value) || square.contains(&value) {
@@ -66,6 +66,18 @@ impl Board {
         true
     }
 
+    fn clear_value_at(&mut self, col_idx: &usize, row_idx: &usize) {
+        let value = self.board[row_idx - 1][col_idx - 1];
+
+        &mut self.cols[col_idx - 1].remove(&value);
+        &mut self.rows[row_idx - 1].remove(&value);
+        &mut self.squares[(col_idx - 1) / 3 + 3 * ((row_idx - 1) / 3)].remove(&value);
+        self.board[row_idx - 1][col_idx - 1] = 0;
+    }
+
+    fn is_empty_at(&self, col_idx: &usize, rox_idx: &usize) -> bool {
+        self.board[rox_idx - 1][col_idx - 1] == 0
+    }
 
     pub fn solve(&self) {}
 }
@@ -126,6 +138,7 @@ mod tests {
             assert_that!(&board.cols[(col_idx - 1)].contains(&9)).is_true();
             assert_that!(&board.rows[(row_idx - 1)].contains(&9)).is_true();
             assert_that!(&board.squares[(box_idx - 1)].contains(&9)).is_true();
+            assert_that!(board.is_empty_at(&col_idx, &row_idx)).is_false();
         }
     }
 
@@ -157,8 +170,8 @@ mod tests {
     #[test]
     fn test_setting_acceptable_value_updates_board() {
         let expected_board: Vec<Vec<u8>> = vec![
-            vec![1, 0, 0, 0, 0, 0, 0, 0, 0],
             vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
+            vec![1, 0, 0, 0, 0, 0, 0, 0, 0],
             vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
             vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
             vec![0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -169,7 +182,7 @@ mod tests {
         ];
         let mut board = Board::new();
 
-        board.set_value_at(&1, &1, 1);
+        board.set_value_at(&1, &2, 1);
 
         assert_that!(board.board).is_equal_to(expected_board);
     }
@@ -194,33 +207,60 @@ mod tests {
 
         assert_that!(board.board).is_equal_to(expected_board);
     }
+
+    #[test]
+    fn test_is_empty_at_return_true_if_cell_at_location_is_empty() {
+        let board = Board::new();
+
+        assert_that!(board.is_empty_at(&1, &1)).is_true();
+    }
+
+    #[test]
+    fn test_is_empty_at_return_false_if_cell_at_location_is_not_empty() {
+        let mut board = Board::new();
+        board.set_value_at(&1, &1, 1);
+
+        assert_that!(board.is_empty_at(&1, &1)).is_false();
+    }
+
+    #[test]
+    fn test_clear_value_at_removes_the_value_at_a_locations_col() {
+        let mut board = Board::new();
+        board.set_value_at(&1, &1, 1);
+
+        board.clear_value_at(&1, &1);
+
+        assert_that!(&board.cols[0].contains(&1)).is_false();
+    }
+
+    #[test]
+    fn test_clear_value_at_removes_the_value_at_a_locations_row() {
+        let mut board = Board::new();
+        board.set_value_at(&1, &1, 1);
+        board.clear_value_at(&1, &1);
+
+        assert_that!(&board.rows[0].contains(&1)).is_false();
+    }
+
+    #[test]
+    fn test_clear_value_at_removes_the_value_at_a_locations_square() {
+        let mut board = Board::new();
+        board.set_value_at(&1, &1, 1);
+        board.clear_value_at(&1, &1);
+
+        assert_that!(&board.squares[0].contains(&1)).is_false();
+    }
+
+    #[test]
+    fn test_clear_value_at_removes_the_value_at_a_locations_cell() {
+        let mut board = Board::new();
+        board.set_value_at(&1, &1, 1);
+        board.clear_value_at(&1, &1);
+
+        assert_that!(&board.is_empty_at(&1, &1)).is_true();
+    }
 }
 
-// def test_is_empty_at_return_true_if_cell_at_location_is_empty(self):
-//     board = Board()
-//
-//     with soft_assertions():
-//         assert_that(board.is_empty_at(1, 1)).is_true()
-//
-// def test_clear_value_at_removes_the_value_at_a_location(self):
-//     board = Board()
-//     board.set_value_at(1, 1, 1)
-//
-//     board.clear_value_at(1, 1)
-//
-//     with soft_assertions():
-//         assert_that(board.cols[0]).does_not_contain(1)
-//         assert_that(board.rows[0]).does_not_contain(1)
-//         assert_that(board.squares[0]).does_not_contain(1)
-//         assert_that(board.full_board[0][0]).is_zero()
-//
-// def test_is_empty_at_return_false_if_cell_at_location_is_not_empty(self):
-//     board = Board()
-//     board.set_value_at(1, 1, 1)
-//
-//     with soft_assertions():
-//         assert_that(board.is_empty_at(1, 1)).is_false()
-//
 // def test_the_board_can_print_itself(self):
 //     expected_output = '[[1, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
 //                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
