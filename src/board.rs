@@ -1,4 +1,5 @@
 use csv;
+use itertools::join;
 
 use crate::cell_group::CellGroup;
 
@@ -8,6 +9,7 @@ pub struct Board {
     rows: Vec<CellGroup>,
     squares: Vec<CellGroup>,
     pub board: Vec<Vec<u8>>,
+    pub solved_board: Vec<Vec<u8>>,
 }
 
 impl Board {
@@ -17,6 +19,7 @@ impl Board {
             rows: Self::initialise_empty_cell_groups(),
             squares: Self::initialise_empty_cell_groups(),
             board: vec![vec![0; 9]; 9],
+            solved_board: vec![vec![0; 9]; 9],
         }
     }
 
@@ -75,8 +78,20 @@ impl Board {
         self.board[row_idx - 1][col_idx - 1] = 0;
     }
 
-    fn is_empty_at(&self, col_idx: &usize, rox_idx: &usize) -> bool {
-        self.board[rox_idx - 1][col_idx - 1] == 0
+    fn is_empty_at(&self, col_idx: &usize, row_idx: &usize) -> bool {
+        self.board[row_idx - 1][col_idx - 1] == 0
+    }
+
+    fn print(&self) -> String {
+        let mut result = String::new();
+
+        for row in self.solved_board.iter(){
+            result.push('[');
+            result.push_str(&join(row, ", "));
+            result.push_str("],\n");
+        }
+
+        result
     }
 
     pub fn solve(&self) {}
@@ -259,25 +274,33 @@ mod tests {
 
         assert_that!(&board.is_empty_at(&1, &1)).is_true();
     }
+
+    #[test]
+    fn test_the_board_can_print_itself() {
+        let expected_output = "[1, 2, 3, 0, 0, 0, 0, 0, 0],\n".to_owned()
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n"
+            + "[0, 0, 0, 0, 0, 0, 0, 0, 0],\n";
+        let mut board = Board::new();
+        board.set_value_at(&1, &1, 1);
+        board.set_value_at(&2, &1, 2);
+        board.set_value_at(&3, &1, 3);
+        board.solved_board = board.board.clone();
+        board.clear_value_at(&1, &1);
+        board.clear_value_at(&2, &1);
+        board.clear_value_at(&3, &1);
+
+        let printed = board.print();
+
+        assert_that!(printed).is_equal_to(expected_output);
+    }
 }
 
-// def test_the_board_can_print_itself(self):
-//     expected_output = '[[1, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0],\n' \
-//                       ' [0, 0, 0, 0, 0, 0, 0, 0, 0]]\n'
-//     output_stream = StringIO()
-//     board = Board()
-//     board.set_value_at(1, 1, 1)
-//     board.print(output_stream)
-//
-//     assert_that(output_stream.getvalue()).is_equal_to(expected_output)
-//
 // def test_the_board_can_be_initialised_from_csv_file(self):
 //     board_file = StringIO('6,,,,,3,,,\n'
 //                           ',9,,8,6,7,3,,\n'
