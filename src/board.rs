@@ -369,17 +369,3 @@ mod tests {
         assert_that!(board.solved_board).is_equal_to(expected_solution);
     }
 }
-
-//     def solve(self) -> None:
-//         for row_idx in range(1, 10):
-//             for col_idx in range(1, 10):
-//                 if not self.is_empty_at(col_idx, row_idx):
-//                     continue
-//
-//                 for value in range(1, 10):
-//                     if self.set_value_at(col_idx, row_idx, value):
-//                         self.solve()
-//                         self.clear_value_at(col_idx, row_idx)
-//                 return
-//         # Save the state before the recursion unwinds and resets the `full_board`
-//         self.solved_board = deepcopy(self.full_board)
