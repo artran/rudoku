@@ -7,7 +7,7 @@ use crate::board::Board;
 
 
 fn main() {
-    let mut brd = Board::from_string(&"600003000\
+    let mut board = Board::from_string(&"600003000\
             090867300\
             037250600\
             004130200\
@@ -17,7 +17,7 @@ fn main() {
             003796080\
             000500001");
 
-    brd.solve();
+    board.solve();
 
-    brd.print();
+    println!("{}", board.print());
 }

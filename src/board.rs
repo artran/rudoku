@@ -25,12 +25,12 @@ impl Board {
         // Fixme: This is incorrect as it doesn't initialise the CellGroups
         let mut board = Self::new();
 
-        board.board = board_str.chars()
-            .map(|character| character.to_digit(10).unwrap() as u8)
-            .collect::<Vec<u8>>()
-            .chunks(9)
-            .map(|chunk| chunk.to_vec())
-            .collect();
+        let mut board_iterator = board_str.chars().map(|c| c.to_digit(10).unwrap() as u8);
+        for row_idx in 1..10 {
+            for col_idx in 1..10 {
+                board.set_value_at(&col_idx, &row_idx, board_iterator.next().unwrap());
+            }
+        }
 
         board
     }
@@ -90,7 +90,6 @@ impl Board {
     pub fn solve(&mut self) {
         for row_idx in 1..10 {
             for col_idx in 1..10 {
-                println!("{}, {}", row_idx, col_idx);
                 if !self.is_empty_at(&col_idx, &row_idx) {
                     continue;
                 }
